@@ -2,11 +2,11 @@
 
 namespace MauiAppMinhasCompras
 {
-    public partial class App : Application
+    public partial class App : Application //inicia o aplicativo
     {
         static SQLiteDatabaseHelper _db;
 
-        public static SQLiteDatabaseHelper Db
+        public static SQLiteDatabaseHelper Db //cria uma propriedade pública para acessar o banco de dados de qualquer lugar do aplicativo.
         {
             get
             {
