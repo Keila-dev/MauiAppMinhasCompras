@@ -7,7 +7,17 @@ public partial class EditarProduto : ContentPage
 	{
 		InitializeComponent();
 	}
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
 
+        Produto p = BindingContext as Produto;
+
+        if (p != null)
+        {
+            picker_categoria.SelectedItem = p.Categoria;
+        }
+    }
     private async void ToolbarItem_Clicked(object sender, EventArgs e)
     {
         try

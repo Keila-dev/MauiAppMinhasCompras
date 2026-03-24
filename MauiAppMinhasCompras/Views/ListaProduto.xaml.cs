@@ -1,5 +1,6 @@
 using MauiAppMinhasCompras.Models;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MauiAppMinhasCompras.Views;
 
@@ -49,6 +50,8 @@ public partial class ListaProduto : ContentPage
         {
             string q = e.NewTextValue;
 
+            lst_produtos.IsRefreshing = true;
+
             lista.Clear();
 
             List<Produto> tmp = await App.Db.Search(q);
@@ -58,6 +61,10 @@ public partial class ListaProduto : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Ops", ex.Message, "OK");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
         }
     }
 
@@ -110,4 +117,75 @@ public partial class ListaProduto : ContentPage
         }
     }
 
+    private async void lst_produtos_Refreshing(object sender, EventArgs e)
+    {
+        try
+        {
+            lista.Clear();
+
+            List<Produto> tmp = await App.Db.GetAll();
+
+            tmp.ForEach(i => lista.Add(i));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
+
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
+        }
+
+    }
+
+    private async void picker_filtro_categoria_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            string categoria = picker_filtro_categoria.SelectedItem?.ToString();
+
+            lista.Clear();
+
+            List<Produto> todos = await App.Db.GetAll();
+
+            List<Produto> filtrados;
+
+            if (categoria == "Todos" || string.IsNullOrEmpty(categoria))
+            {
+                filtrados = todos;
+            }
+            else
+            {
+                filtrados = todos.Where(p => p.Categoria == categoria).ToList();
+            }
+
+            filtrados.ForEach(i => lista.Add(i));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Erro", ex.Message, "OK");
+        }
+    }
+
+    private async void ToolbarItem_Clicked_2(object sender, EventArgs e)
+    {
+        var relatorio = lista
+        .GroupBy(p => p.Categoria)
+        .Select(g => new
+        {
+            Categoria = g.Key,
+            Total = g.Sum(p => p.Total)
+        });
+
+        string msg = "";
+
+        foreach (var item in relatorio)
+        {
+            msg += $"{item.Categoria}: {item.Total:C}\n";
+        }
+
+       await DisplayAlert("Gastos por Categoria", msg, "OK");
+    
+    }
 }

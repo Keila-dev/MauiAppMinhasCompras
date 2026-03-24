@@ -17,13 +17,16 @@ public partial class NovoProduto : ContentPage
             {
                 Descricao = txt_descricao.Text,
                 Quantidade = Convert.ToDouble(txt_quantidade.Text),
+                Categoria = picker_categoria.SelectedItem.ToString(),
                 Preco = Convert.ToDouble(txt_preco.Text)
             };
 
             await App.Db.Insert(p);
             await DisplayAlert("Sucesso!", "Registro Inserido", "OK");
+            await Navigation.PopAsync(); //voltar para a tela inicial automaticamente
 
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             await DisplayAlert("Ops", ex.Message, "OK");
         }
